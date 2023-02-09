@@ -6,25 +6,28 @@
 #include <signal.h>
 
 void handle_sig(int sig) {
-    printf("Control-C was pressed. Exiting...");
+    printf("Control-C was pressed. Exiting...\n");
     exit(0);
 }
 
 int main(int argc, char *argv[]) {
+	struct sigaction sa;
+	sa.sa_handler = &handle_sig;
+	sigaction(SIGINT, &sa, NULL);
 	int rc = fork();
 
 	if (rc < 0) {
 		fprintf(stderr, "fork failed\n");
 		exit(1);
 	} else if (rc == 0) { //Child process
+		struct sigaction sa;
+		sa.sa_handler = SIG_DFL;
+		sigaction(SIGINT, &sa, NULL);
 		char *userin[1024];
 		char buff[1024];
 		char delimiter[] = " ";
 		char *token;
 		int i = 0;
-		struct sigaction sa;
-		sa.sa_handler = &handle_sig;
-		sigaction(SIGINT, &sa, NULL);
 
 		printf("Execute? ");
 		fgets(buff, 1024, stdin);
