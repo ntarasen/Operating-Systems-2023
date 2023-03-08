@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -x
 ./fractal -maxiter 5 -width 10 -height 5 -output fractal-10_5.bmp
 ./fractal -maxiter 5 -width 25 -height 21 -output fractal-25_21.bmp
@@ -18,3 +19,5 @@ diff fractal-10_5.bmp fractal-task10_5.bmp
 diff fractal-10_5.bmp fractal-row10_5.bmp
 diff fractal-25_21.bmp fractal-task25_21.bmp
 diff fractal-25_21.bmp fractal-row25_21.bmp
+
+#This is a shell script to run tests
