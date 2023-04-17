@@ -6,11 +6,18 @@
 #include <signal.h>
 
 void handle_sig(int sig) { //signal handler to be called when user presses ctrl-C
-    printf("Control-C was pressed. Exiting...\n");
-    exit(0);//exit with return code 0
+	printf("Control-C was pressed. Exiting...\n");
+	exit(0);//exit with return code 0
 }
 
 int main(int argc, char *argv[]) {
+	/* Preventing fork bomb 
+	   struct rlimit limit;
+	   getrlimit(RLIMIT_NPROC, &limit);
+	   limit.rlim_cur = 64;
+	   setrlimit(RLIMIT_NPROC, &limit);
+	   */
+
 	struct sigaction sa; 
 	sa.sa_handler = &handle_sig; //Tells OS what function to call when the user inputs a signal
 	sigaction(SIGINT, &sa, NULL); //Signal is handled
@@ -23,7 +30,7 @@ int main(int argc, char *argv[]) {
 		struct sigaction sa;
 		/* next two lines got rid of a double call to handle_sig when I ran the code. It uses SIG_DFL which is the default behavior of the signal*/
 
-		sa.sa_handler = SIG_DFL;
+		sa.sa_handler = &handle_sig;
 		sigaction(SIGINT, &sa, NULL);
 		char *userin[1024];
 		char buff[1024];
@@ -42,14 +49,13 @@ int main(int argc, char *argv[]) {
 			i++;
 			token = strtok(NULL, delimiter);
 		}
-		
-		printf("Executing: %s\n", userin[0]);	
+
 		int exec_return = execvp(userin[0], userin); //executes the command in userin[0] with the arguments stored at the address userin.	
 		if (exec_return == -1) {
 			perror("Error: ");
 			exit(1);
 		}
-		
+
 	} else { //Parent process
 		wait(NULL); //waiting for child process to finish
 		printf("Execution complete!\n");
